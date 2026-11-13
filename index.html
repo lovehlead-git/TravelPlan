@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>旅行手札｜我們的旅程</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand serif" href="index.html">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#2f5d4a"/><path d="M5 23l7-9 5 6 3-4 7 7z" fill="#f6f1e7"/><circle cx="22" cy="10" r="2.5" fill="#c99a3b"/></svg>
+      旅行手札
+    </a>
+    <nav><a href="#trips">所有旅程</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="home-hero">
+    <div class="eyebrow">TRAVEL JOURNAL</div>
+    <h1>走過的路，<br>都收在這裡。</h1>
+    <p>依年度瀏覽每一趟旅程，點開卡片即可查看當次的完整行程、地址與備忘。</p>
+  </section>
+
+  <div class="filter" role="toolbar" aria-label="依年度篩選">
+    <span class="label">年度</span>
+    <div id="chips" style="display:contents"></div>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="trips"></div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">旅行手札 · 新增旅程時，只要在 index.html 的 <code>TRIPS</code> 清單加一筆，並建立對應的行程頁即可。</div>
+</footer>
+
+<script>
+/* ===== 旅程資料：新增旅程就在這裡加一筆 ===== */
+const TRIPS = [
+  {
+    title: "三義兩天一夜",
+    subtitle: "慢活、鐵道與山林之旅",
+    start: "2026-11-14",
+    end:   "2026-11-15",
+    place: "苗栗・三義",
+    tags: ["西湖渡假村", "舊山線鐵道自行車", "客家料理"],
+    url: "trips/2026-11-sanyi.html",
+    art: "rail"
+  },
+  {
+    title: "竹山・日月潭兩天一夜",
+    subtitle: "甕缸雞、湖畔騎行與晨間步道",
+    start: "2026-02-19",
+    end:   "2026-02-20",
+    place: "南投・竹山／日月潭",
+    tags: ["甕缸雞", "向山自行車道", "貓囒山步道", "多肉花園"],
+    url: "trips/2026-02-sunmoonlake.html",
+    art: "lake"
+  }
+];
+
+/* ===== 卡片插圖（純 SVG，不需外部圖片） ===== */
+const ART = {
+  rail: `<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dcb0"/><stop offset="1" stop-color="#e9c9a0"/></linearGradient></defs>
+    <rect width="320" height="180" fill="url(#sky)"/>
+    <circle cx="245" cy="58" r="20" fill="#f7efe0" opacity=".9"/>
+    <path d="M0 110 L50 70 L95 100 L150 55 L210 98 L260 72 L320 104 V180 H0Z" fill="#7d9a78"/>
+    <path d="M0 128 L60 98 L120 122 L180 92 L240 120 L320 96 V180 H0Z" fill="#4f7f63"/>
+    <path d="M0 150 Q160 120 320 150 V180 H0Z" fill="#2f5d4a"/>
+    <g stroke="#3a2f25" stroke-width="2.4" fill="none">
+      <path d="M-10 172 Q160 140 330 172"/><path d="M-10 180 Q160 148 330 180"/>
+    </g>
+    <g stroke="#6b5440" stroke-width="3">
+      ${Array.from({length:14},(_,i)=>{const x=i*24+4;return `<line x1="${x}" y1="${170-Math.sin(i/13*Math.PI)*24}" x2="${x}" y2="${180-Math.sin(i/13*Math.PI)*24}"/>`}).join("")}
+    </g>
+    <g fill="#b5562f"><rect x="132" y="128" width="40" height="14" rx="3"/><circle cx="140" cy="144" r="4" fill="#2b2a26"/><circle cx="164" cy="144" r="4" fill="#2b2a26"/></g>
+  </svg>`,
+  lake: `<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="320" height="180" fill="#cfe3e6"/>
+    <circle cx="70" cy="50" r="18" fill="#f7efe0" opacity=".9"/>
+    <path d="M0 100 L60 62 L110 92 L170 50 L230 90 L280 66 L320 88 V180 H0Z" fill="#6f9a86"/>
+    <path d="M0 112 L70 90 L140 110 L210 86 L320 108 V180 H0Z" fill="#3f6f5a"/>
+    <rect y="118" width="320" height="62" fill="#4f8fa0"/>
+    <g stroke="#cfe8ee" stroke-width="2" stroke-linecap="round" opacity=".7">
+      <line x1="30" y1="134" x2="70" y2="134"/><line x1="150" y1="146" x2="200" y2="146"/><line x1="240" y1="132" x2="280" y2="132"/>
+    </g>
+    <rect y="172" width="320" height="8" fill="#c9b48a"/>
+    <g stroke="#2b2a26" stroke-width="2.5" fill="none"><circle cx="128" cy="164" r="9"/><circle cx="158" cy="164" r="9"/><path d="M128 164 L140 150 L158 164 M140 150 L150 150"/></g>
+  </svg>`,
+  default: `<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="320" height="180" fill="#cfe0d3"/><path d="M0 120 L80 70 L150 115 L230 60 L320 112 V180 H0Z" fill="#4f7f63"/><path d="M0 150 Q160 125 320 150 V180 H0Z" fill="#2f5d4a"/></svg>`
+};
+
+const WEEK = ["日","一","二","三","四","五","六"];
+function fmt(d){ const t=new Date(d+"T00:00:00"); return `${t.getMonth()+1}/${t.getDate()} (${WEEK[t.getDay()]})`; }
+function nights(a,b){ const n=Math.round((new Date(b)-new Date(a))/864e5); return n<=0?"一日遊":`${n+1} 天 ${n} 夜`; }
+const yearOf = t => t.start.slice(0,4);
+
+const years = [...new Set(TRIPS.map(yearOf))].sort((a,b)=>b-a);
+let current = "all";
+try { const h = location.hash.replace("#y",""); if (years.includes(h)) current = h; } catch(e){}
+
+function renderChips(){
+  const box = document.getElementById("chips");
+  const opts = [["all","全部",TRIPS.length], ...years.map(y=>[y,y,TRIPS.filter(t=>yearOf(t)===y).length])];
+  box.innerHTML = opts.map(([v,l,n])=>`<button class="chip" data-y="${v}" aria-pressed="${v===current}">${l}<span class="n">${n}</span></button>`).join("");
+  box.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{
+    current=b.dataset.y;
+    try{ history.replaceState(null,"",current==="all"?location.pathname:"#y"+current); }catch(e){}
+    renderChips(); renderTrips();
+  }));
+}
+
+function card(t){
+  return `<a class="card" href="${t.url}">
+    <div class="card-art">${ART[t.art]||ART.default}<span class="badge">${nights(t.start,t.end)}</span></div>
+    <div class="card-body">
+      <div class="card-date">${fmt(t.start)}${t.end!==t.start?" – "+fmt(t.end):""} · ${t.place}</div>
+      <h3>${t.title}</h3>
+      <p class="sub">${t.subtitle}</p>
+      <div class="tags">${t.tags.map(x=>`<span class="tag">${x}</span>`).join("")}</div>
+      <div class="more">查看詳細行程 <span>→</span></div>
+    </div></a>`;
+}
+
+function renderTrips(){
+  const list = TRIPS.filter(t=>current==="all"||yearOf(t)===current).sort((a,b)=>b.start.localeCompare(a.start));
+  document.getElementById("count").textContent = `共 ${list.length} 趟旅程`;
+  const box = document.getElementById("trips");
+  if(!list.length){ box.innerHTML = `<div class="empty">這個年度還沒有旅程紀錄。</div>`; return; }
+  const ys = [...new Set(list.map(yearOf))];
+  box.innerHTML = ys.map(y=>{
+    const items = list.filter(t=>yearOf(t)===y);
+    return `<section class="year-group"><h2>${y}<small>${items.length} 趟</small></h2><div class="grid">${items.map(card).join("")}</div></section>`;
+  }).join("");
+}
+
+renderChips(); renderTrips();
+</script>
+</body>
+</html>
